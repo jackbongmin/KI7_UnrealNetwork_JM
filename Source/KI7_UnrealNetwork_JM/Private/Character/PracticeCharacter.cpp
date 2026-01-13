@@ -38,6 +38,18 @@ void APracticeCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (HealthWidgetComponent)
+	{
+		APlayerController* PC = GetWorld()->GetFirstPlayerController();
+		if (PC && PC->PlayerCameraManager)
+		{
+			// 회전 -> 벡터 만들기 가능(해당 회전으로 인한 Forward 백터를 만듬)
+			// 벡터 -> 회전 만들기 가능
+			FVector CameraForward = PC->PlayerCameraManager->GetCameraRotation().Vector();	// 카메라의 Forward 벡터
+			FVector WidgetForward = CameraForward * -1.0f;
+			HealthWidgetComponent->SetWorldRotation(WidgetForward.Rotation());
+		}
+	}
 }
 
 // Called to bind functionality to input
