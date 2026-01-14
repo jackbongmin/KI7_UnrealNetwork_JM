@@ -1,0 +1,57 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Character.h"
+#include "RPCCharacter.generated.h"
+
+UCLASS()
+class KI7_UNREALNETWORK_JM_API ARPCCharacter : public ACharacter
+{
+	GENERATED_BODY()
+
+public:
+	// Sets default values for this character's properties
+	ARPCCharacter();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "TestRPC")
+	void Fire();
+
+protected:
+
+	// 리턴타입은 무조건 void, 커넥션이 있어야 호출이 가능하다.
+	// 파라메터 타입은 대체로 가능(TSet, TMap 불가능)
+	// 함수 구현은 뒤에 _Implementation이 붙어야한다.
+	UFUNCTION(Server, Reliable)	// Server : 서버 RPC, Reliable : 무조건 실행(수신 확인시까지 요청 반복)
+	void Server_Fire();			
+
+	UFUNCTION(Client, Reliable)
+	void Client_OnHit();
+
+	UFUNCTION()
+	void OnTakeDamage(
+		AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
+		class AController* InstigatedBy, AActor* DamageCauser);
+
+
+protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TestRPC")
+	TObjectPtr<USceneComponent> FireLocation = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TestRPC")
+	TSubclassOf<AActor> ProjectileClass = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TestRPC")
+	TSubclassOf<class UCameraShakeBase> CameraShakeClass = nullptr;
+
+
+};
