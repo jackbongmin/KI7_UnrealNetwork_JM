@@ -23,6 +23,10 @@ void ATestPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 void ATestPlayerState::OnRep_MyScore()
 {
-	// UI 갱신
+	if (OnScoreChanged.IsBound())
+	{
+		OnScoreChanged.Broadcast(MyScore);
+	}
+
 	UE_LOG(LogTemp, Log, TEXT("Score : %d"), MyScore);
 }

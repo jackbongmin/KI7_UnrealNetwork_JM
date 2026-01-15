@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "PlayerStateCharacter.generated.h"
 
+//DECLARE_DELEGATE_OneParam(FOnScoreUpdate, int32);
+
 UCLASS()
 class KI7_UNREALNETWORK_JM_API APlayerStateCharacter : public ACharacter
 {
@@ -20,6 +22,12 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+
+	//virtual void OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerState* OldPlayerState) override;
+
+	//void InitScoreWidget();
+public:
+
 	UFUNCTION(Server, Reliable)
 	void Server_AddScore(int32 Point);
 
@@ -27,5 +35,16 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable, Category = "Test")
 	void TestAddScore();
+
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<class UWidgetComponent> ScoreWidgetComponent = nullptr;
+
+	//FOnScoreUpdate OnScoreUpdated;
+
+private:
+	UPROPERTY()
+	TWeakObjectPtr<class UDataLineWidget> ScoreWidget = nullptr;
 
 };

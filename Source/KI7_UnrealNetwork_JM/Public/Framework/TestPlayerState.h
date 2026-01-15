@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerState.h"
 #include "TestPlayerState.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnScoreChangedDelegate, int32, InScore);
+
 /**
  * 
  */
@@ -20,6 +22,10 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Score")
 	int32 GetMyScore() const { return MyScore; }
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnScoreChangedDelegate OnScoreChanged;
+
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
