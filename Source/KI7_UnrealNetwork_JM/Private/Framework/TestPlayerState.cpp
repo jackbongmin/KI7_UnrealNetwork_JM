@@ -1,7 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Framework/TestPlayerState.h"
+#include "Framework/MainHUD.h"
+#include "UI/ScoreHudWidget.h"
 #include "Net/UnrealNetwork.h"
 
 void ATestPlayerState::AddMyScore(int32 Point)
@@ -13,16 +14,51 @@ void ATestPlayerState::AddMyScore(int32 Point)
 	}
 }
 
+void ATestPlayerState::SetMyName(const FString& NewName)
+{
+	if (NewName.IsEmpty())
+	{
+		MyName = TEXT("MyPlayer");
+	}
+	else
+	{
+		MyName = NewName;
+	}
+}
+
 void ATestPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ATestPlayerState, MyScore);	// 모든 클라이언트에 리플리케이션
-
+	DOREPLIFETIME(ATestPlayerState, MyName);
 }
 
 void ATestPlayerState::OnRep_MyScore()
 {
 	// UI 갱신
-	UE_LOG(LogTemp, Log, TEXT("Score : %d"), MyScore);
+	UE_LOG(LogTemp, Log, TEXT("[%d]Score : %d"), GetPlayerId(), MyScore);
+
+	if (!ScoreHud.IsValid())
+	{
+		if (APlayerController* PC = GetPlayerController())
+		{
+			AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD());
+			if (HUD)
+			{
+				ScoreHud = Cast<UScoreHUDWidget>(HUD->GetMainHudWidget().Get());
+			}
+		}
+	}
+
+	if (ScoreHud.IsValid())
+	{
+		ScoreHud->UpdateScore(MyScore);
+	}
+
+
+}
+
+void ATestPlayerState::OnRep_MyName()
+{
 }
