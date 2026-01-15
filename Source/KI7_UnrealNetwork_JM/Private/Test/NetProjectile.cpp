@@ -28,8 +28,8 @@ ANetProjectile::ANetProjectile()
 
 	Movement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Movement"));
 	//Movement->UpdatedComponent = Collision;
-	Movement->InitialSpeed = 1000.0f;
-	Movement->MaxSpeed = 1000.0f;
+	Movement->InitialSpeed = 5000.0f;
+	Movement->MaxSpeed = 5000.0f;
 	Movement->bShouldBounce = true;
 
 }
@@ -38,32 +38,36 @@ ANetProjectile::ANetProjectile()
 void ANetProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	OnActorHit.AddDynamic(this, &ANetProjectile::OnHit);
 
 	if (GetInstigator())
 	{
-		Collision->IgnoreActorWhenMoving(GetInstigator(), true);	// 인스티게이터가 설정되어 있으면 충돌 무시하기
+		Collision->IgnoreActorWhenMoving(GetInstigator(), true);
+
+		GetInstigator()->MoveIgnoreActorAdd(this);
 	}
+
+	OnActorHit.AddDynamic(this, &ANetProjectile::OnHit);
 }
 
 void ANetProjectile::OnHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (HasAuthority())	// 서버에서만 히트처리
+	if (HasAuthority())	// 서버에서만 히트 처리
 	{
-		if (!bHitted && OtherActor->IsA<ACharacter>())	// 한번도 충돌한적 없고, 캐릭터와 캐릭터의 파생클래스만 처리
+		if (!bHitted && OtherActor->IsA<ACharacter>()	// 한번도 충돌한적 없고, 캐릭터와 캐릭터의 파생클래스만 처리
+			&& this != OtherActor && GetOwner() != OtherActor)
 		{
 			// 데미지 주기
 			UGameplayStatics::ApplyDamage(OtherActor, 10.0f, GetInstigatorController(), this, UDamageType::StaticClass());
-			
 
 			if (GetInstigator())
 			{
 				UE_LOG(LogTemp, Log, TEXT("%s가 %s를 공격했다."), *GetInstigator()->GetName(), *OtherActor->GetName());
 				// 누가 누구를 공격했는지 출력
 			}
+
 			Multicast_HitEffect(Hit.ImpactPoint, Hit.ImpactNormal.Rotation());	// 모두에게 이팩트 재생 보이기
 			SetLifeSpan(2.0f);	// 2초뒤에 삭제
-			bHitted = true;		// 히트판정 기록
+			bHitted = true;		// 처음 Hit되었음을 기록
 		}
 	}
 }
