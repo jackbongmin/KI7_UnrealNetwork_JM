@@ -54,7 +54,7 @@ void UGameStateMainHUDWidget::UpdateTimeDisplay()
 
 void UGameStateMainHUDWidget::UpdateGameOverDisplay()
 {
-	if (CachedGameState->IsGameOver())
+	if (CachedGameState.IsValid() && CachedGameState->IsGameOver())
 	{
 		GameOverText->SetVisibility(ESlateVisibility::HitTestInvisible);
 	}
