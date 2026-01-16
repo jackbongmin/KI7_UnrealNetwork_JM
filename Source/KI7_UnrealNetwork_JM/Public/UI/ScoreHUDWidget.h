@@ -25,15 +25,15 @@ public:
 
 private:
 	UFUNCTION()
-	void NameCommitted(const FText& Text, ETextCommit::Type ComitMethod);
+	void NameCommitted(const FText& Text, ETextCommit::Type CommitMethod);
 
 protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, meta = (BindWidget))
 	TObjectPtr<UDataLineWidget> Score;
-	
+
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, meta = (BindWidget))
 	TObjectPtr<UEditableTextBox> NameInput;
 
-
-
+private:
+	TWeakObjectPtr<class APlayerStateCharacter> OwningPlayerCharacter = nullptr;
 };

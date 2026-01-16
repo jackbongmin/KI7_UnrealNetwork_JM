@@ -4,6 +4,7 @@
 #include "Framework/MainHUD.h"
 #include "UI/ScoreHudWidget.h"
 #include "Net/UnrealNetwork.h"
+#include "Character/PlayerStateCharacter.h"
 
 void ATestPlayerState::AddMyScore(int32 Point)
 {
@@ -16,13 +17,17 @@ void ATestPlayerState::AddMyScore(int32 Point)
 
 void ATestPlayerState::SetMyName(const FString& NewName)
 {
-	if (NewName.IsEmpty())
+	if (HasAuthority())
 	{
-		MyName = TEXT("MyPlayer");
-	}
-	else
-	{
-		MyName = NewName;
+		if (NewName.IsEmpty())
+		{
+			MyName = TEXT("MyPlayer");
+		}
+		else
+		{
+			MyName = NewName;
+		}
+		OnRep_MyName();
 	}
 }
 
@@ -61,4 +66,11 @@ void ATestPlayerState::OnRep_MyScore()
 
 void ATestPlayerState::OnRep_MyName()
 {
+	UE_LOG(LogTemp, Log, TEXT("[%d]Name : %s"), GetPlayerId(), *MyName);
+
+	if (APlayerStateCharacter* Character = GetPawn<APlayerStateCharacter>())
+	{
+		//UE_LOG(LogTemp, Log, TEXT("APlayerStateCharacter 있음"));
+		Character->UpdateNamePlate(MyName);
+	}
 }

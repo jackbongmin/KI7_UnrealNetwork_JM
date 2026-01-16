@@ -23,9 +23,23 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void Server_AddScore(int32 Point);
 
+	UFUNCTION(Server, Reliable)
+	void Server_SetMyName(const FString& NewName);
+
+public:
+	void SetMyName(const FString& NewName);
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateNamePlate(const FString& NewName);
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Test")
 	void TestAddScore();
 
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<class UWidgetComponent> NameWidgetComponent = nullptr;
+
+	UPROPERTY()
+	TWeakObjectPtr<class UDataLineWidget> NameWidget = nullptr;
 };
